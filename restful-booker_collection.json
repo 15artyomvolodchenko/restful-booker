@@ -1,0 +1,453 @@
+{
+  "info": {
+    "_postman_id": "147f9359-181a-4a22-abed-7e9007be099f",
+    "name": "restful-booker",
+    "description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58666972",
+    "_collection_link": "https://go.postman.co/collection/58666972-147f9359-181a-4a22-abed-7e9007be099f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "/auth",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Token returned\", function () {\n\n    pm.expect(responseData).to.have.property('token');\n    pm.expect(responseData.token).to.not.be.null;\n});\npm.environment.set(\"token\", responseData.token);"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "content-length": true,
+          "host": true,
+          "user-agent": true,
+          "accept": true,
+          "accept-encoding": true,
+          "connection": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\" : \"admin\",\r\n    \"password\" : \"password123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/auth",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "auth"
+          ]
+        },
+        "description": "1. StartFragmentEndFragment\n    \n    1. Позтитвный сцнеарий. (хэдер и тело на месте).  \n        ОР: успех 200 и возвращение токена с последующей его записью в переменные окружения\n        \n    2. В теле запроса меняем пароль и/или логин на несуществующий  \n        ОР: 200 и ошибка по логину\n        \n    3. Из хэдэра уберем обязательный  \n        ОР: 200 и ошибка по логину\n        \n    4. добавим несуществующий хэдэр и/или квери-парам  \n        ОР: успех 200 и возвращение токена с последующей его записью в переменные окружения"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Is it array\", function () {\n\n    pm.expect(responseData).to.be.an('array');\n\n    pm.expect(responseData[0]).to.have.property('bookingid');\n});\n"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "connection": true,
+          "accept": true,
+          "accept-encoding": true,
+          "user-agent": true,
+          "host": true
+        }
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URL}}/booking?firstname={{firstname}}&lastname={{lastname}}&checkin={{checkin}}&checkout={{checkout}}",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking"
+          ],
+          "query": [
+            {
+              "key": "firstname",
+              "value": "{{firstname}}",
+              "description": "необязательный"
+            },
+            {
+              "key": "lastname",
+              "value": "{{lastname}}",
+              "description": "необязательный"
+            },
+            {
+              "key": "checkin",
+              "value": "{{checkin}}",
+              "description": "необязательный"
+            },
+            {
+              "key": "checkout",
+              "value": "{{checkout}}",
+              "description": "необязательный"
+            }
+          ]
+        },
+        "description": "1. Полный позтитвный сцнеарий. (параметры на месте).  \n    ОР: успех 200 и возвращение массива со списком бронирований, совпадающего по всему списку параметров\n    \n2. Позтитвный сцнеарий. (параметры убрали).  \n    ОР: успех 200 и возвращение массива со списком всех бронирований на сайте\n    \n3. Позтитвный сцнеарий. (параметры точечно).  \n    ОР: успех 200 и возвращение массива со списком бронирований по заданным параметрам\n    \n4. Подменим один из параметров на явно несуществующий (например, имя 'Вася')  \n    ОР: успех 200 и возвращение пустого массива\n    \n5. Подменим один из параметров на явно несуществующий (например, дата заселения в 2067)  \n    ОР: успех 200 и возвращение пустого массива (ФР: возвращаются брони, но на реальном сайте такого бы не было))))\n    \n6. добавим несуществующий хэдэр и/или квери-парам  \n    ОР: успех 200 и возвращение массива со всеми бронированиями на сайте"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking/{{id}}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Necessary Fields\", function () {\n    pm.expect(responseData).to.have.property('firstname');\n    pm.expect(responseData).to.have.property('lastname');\n    pm.expect(responseData).to.have.property('totalprice');\n    pm.expect(responseData).to.have.property('depositpaid');\n    pm.expect(responseData).to.have.property('bookingdates');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkin');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkout');\n    pm.expect(responseData).to.have.property('additionalneeds');\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "accept": true,
+          "content-length": true,
+          "connection": true,
+          "user-agent": true,
+          "accept-encoding": true,
+          "host": true
+        }
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{URL}}/booking/",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking",
+            ""
+          ]
+        },
+        "description": "StartFragment\n\n1. StartFragmentEndFragment\n    \n    1. Полный позтитвный сцнеарий. (параметры и хэдэр на месте).  \n        ОР: успех 200 и возвращение бронирования, совпадающего по id\n        \n    2. Позтитвный сцнеарий. (параметры убрали, хэдэр на месте).  \n        ОР: 404, т.к. id обязателен\n        \n    3. параметры на месте, хэдэр убрали  \n        ОР: 400 – бэд риквест\n        \n    4. параметры и хэдэр убрали.  \n        ОР: 400 – бэд риквест\n        \n    5. добавим несуществующий хэдэр и/или квери-парам  \n        ОР: успех 200 и возвращение массива со всеми бронированиями на сайте\n        \n    6. добавим в квери-парам буквы (id же)  \n        ОР: ошибка 400 плохой запрос ( я так вижу)\n        \n\nEndFragment"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Necessary Fields\", function () {\n    pm.expect(responseData).to.have.property('bookingid');\n    pm.expect(responseData).to.have.property('booking');\n    pm.expect(responseData).to.have.nested.property('booking.firstname');\n    pm.expect(responseData).to.have.nested.property('booking.lastname');\n    pm.expect(responseData).to.have.nested.property('booking.totalprice');\n    pm.expect(responseData).to.have.nested.property('booking.depositpaid');\n    pm.expect(responseData).to.have.nested.property('booking.bookingdates');\n    pm.expect(responseData).to.have.nested.property('booking.bookingdates.checkin');\n    pm.expect(responseData).to.have.nested.property('booking.bookingdates.checkout');\n    pm.expect(responseData).to.have.nested.property('booking.additionalneeds');\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "user-agent": true,
+          "accept-encoding": true,
+          "connection": true,
+          "content-length": true,
+          "host": true,
+          "accept": true
+        }
+      },
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstname\" : \"John\",\r\n    \"lastname\" : \"Smith\",\r\n    \"depositpaid\" : true,\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"2026-10-01\",\r\n        \"checkout\" : \"2026-10-08\"\r\n    },\r\n    \"additionalneeds\" : \"Breakfast\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/booking",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking"
+          ]
+        },
+        "description": "StartFragment\n\n1. Полный позтитвный сцнеарий. (хэдэр и тело на месте).  \n    ОР: успех 200 и возвращение того, что описано в body + id нового бронирования\n    \n2. убираем 1/все обязательные хэдеры  \n    ОР:400 плохой запросик\n    \n3. в теле depositpaid – true передать в кавычках, и totalprice тоже  \n    ОР: смотря от того как написан код. если заморочались, бэк скушает и выдаст 200 как надо\n    \n4. уберем из тела 1 из пар ключ-значение  \n    ОР: 400\n    \n5. уберем 1 из значений  \n    ОР: 400\n    \n\nEndFragment"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking/{{id}}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Necessary Fields\", function () {\n    pm.expect(responseData).to.have.property('firstname');\n    pm.expect(responseData).to.have.property('lastname');\n    pm.expect(responseData).to.have.property('totalprice');\n    pm.expect(responseData).to.have.property('depositpaid');\n    pm.expect(responseData).to.have.property('bookingdates');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkin');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkout');\n    pm.expect(responseData).to.have.property('additionalneeds');\n});\n"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "accept": true,
+          "user-agent": true,
+          "accept-encoding": true,
+          "connection": true,
+          "host": true,
+          "content-length": true
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{token}}",
+            "description": "необязательный"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "description": "необязательный",
+            "disabled": true
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstname\" : \"John\",\r\n    \"lastname\" : \"Smith\",\r\n    \"depositpaid\" : true,\r\n    \"bookingdates\" : {\r\n        \"checkin\" : \"2026-10-01\",\r\n        \"checkout\" : \"2026-10-08\"\r\n    },\r\n    \"additionalneeds\" : \"Breakfast\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/booking/{{id}}",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        },
+        "description": "StartFragment\n\n1. позитив – хэдэры и параметры и тело – все в полном порядке  \n    ОР: успех 200 и возвращение в ответе измененного бронирования\n    \n2. убираем обязательный параметр  \n    ОР: 404\n    \n3. парам на месте, уберем 1 из необязательных хэдэров (как-то авторизоваться все же надо) по очереди  \n    ОР: 200\n    \n4. парам на месте, уберем оба необзяталдьных хэдера (без авторизационного токена вообще)  \n    ОР: 401 – не авторизован (все еще 403)\n    \n5. уберем обязательный хэдэр  \n    ОР: 400\n    \n6. в теле depositpaid – true передать в кавычках, и totalprice тоже  \n    ОР: смотря от того как написан код. если заморочались, бэк скушает и выдаст 200 как надо\n    \n7. уберем из тела 1 из пар ключ-значение  \n    ОР: 400\n    \n\nEndFragment"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking/{{id}}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\nconst responseData = pm.response.json();\n\npm.test(\"Necessary Fields\", function () {\n    pm.expect(responseData).to.have.property('firstname');\n    pm.expect(responseData.firstname).to.equal('James');\n    pm.expect(responseData).to.have.property('lastname');\n    pm.expect(responseData.lastname).to.equal('Brown');\n    pm.expect(responseData).to.have.property('totalprice');\n    pm.expect(responseData).to.have.property('depositpaid');\n    pm.expect(responseData).to.have.property('bookingdates');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkin');\n    pm.expect(responseData.bookingdates.checkin).to.equal('2026-10-02');\n    pm.expect(responseData).to.have.nested.property('bookingdates.checkout');\n    pm.expect(responseData.bookingdates.checkout).to.equal('2026-10-10');\n    pm.expect(responseData).to.have.property('additionalneeds');\n});\n"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "accept": true,
+          "user-agent": true,
+          "accept-encoding": true,
+          "connection": true,
+          "host": true,
+          "content-length": true
+        }
+      },
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{token}}",
+            "description": "необязательный"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "description": "необязательный"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"firstname\" : \"Jmes\",\r\n    \"lastname\" : \"Brwn\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{URL}}/booking/{{id}}",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        },
+        "description": "StartFragment\n\n1. позитив – хэдэры и параметры и тело – все в полном порядке  \n    ОР: успех 200 и возвращение в ответе измененного бронирования\n    \n2. убираем обязательный параметр  \n    ОР: 404\n    \n3. парам на месте, уберем 1 из необязательных хэдэров (как-то авторизоваться все же надо) по очереди  \n    ОР: 200\n    \n4. парам на месте, уберем оба необязательных хэдера (без авторизационного токена вообще)  \n    ОР: 401 – не авторизован\n    \n5. уберем обязательный  \n    ОР: 400\n    \n6. в теле depositpaid – true передать в кавычках, и totalprice тоже  \n    ОР: смотря от того как написан код. если заморочались, бэк скушает и выдаст 200 как надо\n    \n7. уберем из тела 1 из пар ключ-значение  \n    ОР: 400\n    \n\nEndFragment"
+      },
+      "response": []
+    },
+    {
+      "name": "/booking/{{id}}",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(201);\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "accept": true,
+          "user-agent": true,
+          "accept-encoding": true,
+          "connection": true,
+          "host": true,
+          "content-length": true
+        }
+      },
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "disabled": true
+          },
+          {
+            "key": "Cookie",
+            "value": "token={{token}}",
+            "description": "необязательный"
+          },
+          {
+            "key": "Authorization",
+            "value": "{{token}}",
+            "description": "необязательный"
+          }
+        ],
+        "url": {
+          "raw": "{{URL}}/booking/{{id}}",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "booking",
+            "{{id}}"
+          ]
+        },
+        "description": "StartFragment\n\n1. позитив – хэдэры и параметры – все в полном порядке  \n    ОР: успех 201\n    \n2. убираем обязательный параметр  \n    ОР: 404\n    \n3. парам на месте, уберем 1 из необязательных хэдэров (как-то авторизоваться все же надо) по очереди  \n    ОР: 201\n    \n4. парам на месте, уберем оба обязательных хэдера (без авторизационного токена вообще)  \n    ОР: 401 – не авторизован\n    \n5. пропишем в параметре несуществующий id  \n    ОР: 201\n    \n\nEndFragment"
+      },
+      "response": []
+    },
+    {
+      "name": "/ping",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(201);\n});"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disabledSystemHeaders": {
+          "accept": true,
+          "user-agent": true,
+          "accept-encoding": true,
+          "connection": true,
+          "host": true,
+          "content-length": true,
+          "content-type": true
+        }
+      },
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{URL}}/ping",
+          "host": [
+            "{{URL}}"
+          ],
+          "path": [
+            "ping"
+          ]
+        },
+        "description": "StartFragment\n\n1. позитив как надо  \n    ОР: 201\n    \n2. добавляем несуществующий параметр  \n    ОР:201\n    \n3. добавляем несуществующий хэдэр  \n    ОР: 201\n    \n\nEndFragment"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "URL",
+      "value": ""
+    },
+    {
+      "key": "id",
+      "value": ""
+    }
+  ]
+}
